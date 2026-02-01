@@ -1,93 +1,154 @@
+################################################################################
+# 🧠 VIRTUAL PSYCHOLOGICAL SUPPORT SYSTEM — BACKEND
+################################################################################
+
 project:
-  name: Virtual Psychological Support System (Backend)
+  title: "🧠 Virtual Psychological Support System"
+  subtitle: "AI-Driven Backend for Student Mental Well-Being"
+  type: "Backend System"
+  focus: "Ethical AI • Mental Health • Crisis Safety"
   description: >
-    An AI-powered, privacy-first backend system designed to support student mental well-being
-    through natural language interaction, standardized psychological assessments,
-    and ethical crisis handling.
+    A privacy-first, AI-powered backend system designed to support student
+    mental well-being through natural language interaction, standardized
+    psychological self-assessments, and responsible crisis intervention.
+    The system emphasizes ethical AI behavior, user safety, and scalability.
+
+################################################################################
+# 🎯 OBJECTIVES
+################################################################################
 
 objectives:
-  - Provide empathetic AI-based mental health support
-  - Integrate standardized psychological assessments
-  - Ensure ethical and safe AI behavior during crisis situations
-  - Maintain user privacy and data security
+  - 💬 Enable empathetic AI-based mental health conversations
+  - 🧪 Integrate clinically recognized psychological questionnaires
+  - 🚨 Detect crisis situations and respond safely without AI hallucination
+  - 🔒 Preserve user privacy and data confidentiality
+  - 🧩 Provide a modular backend suitable for real-world deployment
+
+################################################################################
+# ⭐ KEY FEATURES
+################################################################################
 
 key_features:
-  - Natural language chat using Google Gemini
-  - Psychological self-assessments:
-      - PHQ-9 (Depression)
-      - GAD-7 (Anxiety)
-      - PSS-10 (Stress)
-      - CBI (Burnout)
-  - Crisis detection and intervention:
-      - Self-harm detection
-      - Harm-to-others detection
-      - AI bypass during crisis
-  - Severity-based AI responses
-  - Privacy-first architecture
-  - Anonymous in-memory analytics
-  - Modular and scalable backend design
+  conversational_ai:
+    - Natural language chat powered by Google Gemini
+    - Trauma-informed, supportive tone
+    - Short, clear, student-friendly responses
+
+  assessments:
+    standardized_tools:
+      - PHQ-9 → Depression screening
+      - GAD-7 → Anxiety screening
+      - PSS-10 → Perceived stress measurement
+      - CBI → Burnout assessment
+
+  crisis_handling:
+    - 🚨 Self-harm detection
+    - 🚨 Harm-to-others detection
+    - ⛔ AI completely bypassed during crisis
+    - 📞 Emergency helplines and support resources provided
+
+  intelligence:
+    - Severity-based response logic
+    - Personalized guidance based on assessment scores
+
+  privacy:
+    - 🔐 No conversation storage
+    - 🔐 No personal identifiers
+    - 🔐 Anonymous in-memory analytics only
+
+################################################################################
+# 🏗️ BACKEND ARCHITECTURE
+################################################################################
 
 backend_architecture:
+  root: src/
   structure:
-    src:
-      app_js: Express application setup and middleware
-      server_js: Server bootstrap
-      routes:
-        chat_js: Chat, crisis handling, and assessment orchestration
-      services:
-        llm_js: Google Gemini AI integration
-        prompts_js: Prompt engineering and system instructions
-        safety_js: Risk and crisis detection logic
-        crisisResponse_js: Backend-controlled crisis responses
-        assessments_js: Questionnaire loader service
-        scoring_js: Assessment scoring and severity categorization
-      data:
-        phq9_json: PHQ-9 questionnaire
-        gad7_json: GAD-7 questionnaire
-        pss10_json: PSS-10 questionnaire
-        cbi_burnout_json: Burnout questionnaire
+    app_js: "Express app setup, middleware, and routing"
+    server_js: "Server bootstrap and listener"
+
+    routes:
+      chat_js: >
+        Central API endpoint handling:
+        chat flow, crisis detection, assessment initiation,
+        and AI orchestration.
+
+    services:
+      llm_js: "Google Gemini AI integration layer"
+      prompts_js: "Prompt engineering and system instructions"
+      safety_js: "Risk analysis and crisis classification"
+      crisisResponse_js: "Hard-coded, safe crisis responses"
+      assessments_js: "Questionnaire loader and dispatcher"
+      scoring_js: "Assessment scoring and severity interpretation"
+
+    data:
+      phq9_json: "PHQ-9 questionnaire data"
+      gad7_json: "GAD-7 questionnaire data"
+      pss10_json: "PSS-10 questionnaire data"
+      cbi_burnout_json: "Burnout questionnaire data"
+
+################################################################################
+# ⚙️ TECHNOLOGY STACK
+################################################################################
 
 tech_stack:
-  runtime: Node.js
-  framework: Express.js
-  ai_model: Google Gemini
-  validation: Zod
-  logging: Morgan
-  security:
-    - Environment variables
-    - No sensitive data logging
-  data_format: JSON
-  version_control: Git and GitHub
+  runtime: "Node.js"
+  framework: "Express.js"
+  ai_model: "Google Gemini"
+  validation: "Zod"
+  logging: "Morgan (privacy-safe)"
+  data_format: "JSON"
+  environment_management: ".env (excluded from GitHub)"
+  version_control: "Git & GitHub"
+
+################################################################################
+# 🔄 SYSTEM WORKFLOW
+################################################################################
 
 system_flow:
-  - User sends message to /chat endpoint
-  - Backend analyzes message for risk or crisis
-  - If crisis detected:
-      - AI is bypassed
-      - Backend returns safe predefined response
-      - Emergency contact information included
-  - If no crisis:
+  - 🧑 User sends a message to the `/chat` endpoint
+  - 🔍 Backend analyzes input for risk signals
+  - 🚨 If crisis detected:
+      - AI generation is stopped immediately
+      - A predefined, safe response is returned
+      - Emergency contact information is included
+  - 💬 If no crisis:
       - AI responds empathetically
-      - User may be prompted to take a psychological assessment
-  - Assessment responses are scored on the backend
-  - AI response is personalized based on severity
+      - User may be prompted to take an assessment
+  - 🧪 Assessment answers are scored on the backend
+  - 🧠 AI tailors responses based on severity level
 
-ethical_ai_handling:
-  principles:
-    - AI never handles crisis responses directly
-    - Crisis responses are backend-controlled
-    - Emergency helpline information is provided
-    - No diagnosis or medical advice given
-    - User safety is the top priority
+################################################################################
+# 🚨 ETHICAL AI & SAFETY DESIGN
+################################################################################
+
+ethical_ai_principles:
+  - AI never handles crisis conversations directly
+  - Crisis logic is strictly backend-controlled
+  - No diagnosis or medical advice is provided
+  - Language remains non-judgmental and supportive
+  - User safety always overrides AI output
+
+################################################################################
+# 🔐 PRIVACY & SECURITY
+################################################################################
 
 privacy_and_security:
-  - No user conversations stored
-  - No personally identifiable information logged
-  - Environment variables excluded from repository
-  - Analytics are anonymous and in-memory only
+  data_handling:
+    - No database storage of conversations
+    - No personally identifiable information collected
+  logging_policy:
+    - No request body logging
+    - Minimal metadata only
+  repository_safety:
+    - `.env` excluded via `.gitignore`
+    - API keys never committed
+
+################################################################################
+# 🔌 API ENDPOINTS
+################################################################################
 
 api_endpoints:
-  health_check:
+  health:
     method: GET
     path: /health
     response: "{ ok: true }"
@@ -96,20 +157,20 @@ api_endpoints:
     normal_chat:
       method: POST
       path: /chat
-      payload:
+      payload_example:
         text: "I feel stressed because of exams"
 
     start_assessment:
       method: POST
       path: /chat
-      payload:
+      payload_example:
         action: start_assessment
         type: pss10
 
     submit_assessment:
       method: POST
       path: /chat
-      payload:
+      payload_example:
         action: submit_assessment
         type: pss10
         answers:
@@ -117,42 +178,49 @@ api_endpoints:
           q2: 2
           q3: 4
 
-getting_started:
-  steps:
-    - Clone the repository from GitHub
-    - Install dependencies using npm install
-    - Create .env file from .env.example
-    - Add Gemini API key to .env
-    - Run server using npm run dev
-  server_url: http://localhost:8080
+################################################################################
+# 🎓 ACADEMIC & EXPO VALUE
+################################################################################
 
-academic_and_expo_relevance:
+academic_relevance:
   demonstrates:
     - Responsible AI deployment
-    - Mental health domain awareness
-    - Backend system design
+    - Mental health domain understanding
+    - Backend system engineering
     - Ethical crisis intervention
-    - Scalable and modular architecture
+    - Scalable and modular design
   suitable_for:
     - College expos
     - Capstone projects
-    - Research demonstrations
+    - Research demos
     - AI ethics discussions
 
-future_enhancements:
+################################################################################
+# 🔮 FUTURE SCOPE
+################################################################################
+
+future_scope:
   - JWT-based authentication
   - Persistent assessment history
-  - Frontend dashboard
-  - Professional therapist referrals
+  - Frontend dashboards
+  - Therapist and counselor integration
   - Multilingual support
-  - Severity-based follow-up plans
+  - Follow-up monitoring and alerts
+
+################################################################################
+# 👨‍💻 AUTHOR
+################################################################################
 
 author:
-  name: Manish Reddy
-  role: Backend and AI Integration
-  degree: B.Tech CSE
-  github: https://github.com/manishreddy731
+  name: "Manish Reddy"
+  role: "Backend & AI Integration"
+  degree: "B.Tech Computer Science Engineering"
+  github: "https://github.com/manishreddy731"
+
+################################################################################
+# ⚠️ DISCLAIMER
+################################################################################
 
 disclaimer: >
-  This system is not a replacement for professional mental health care.
-  It is intended only as a supportive and educational tool.
+  This system is not a substitute for professional mental health care.
+  It is intended solely as a supportive, educational, and research-oriented tool.
