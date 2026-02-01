@@ -1,6 +1,6 @@
-################################################################################
+
 # 🧠 VIRTUAL PSYCHOLOGICAL SUPPORT SYSTEM — BACKEND
-################################################################################
+
 
 project:
   title: "🧠 Virtual Psychological Support System"
@@ -13,9 +13,9 @@ project:
     psychological self-assessments, and responsible crisis intervention.
     The system emphasizes ethical AI behavior, user safety, and scalability.
 
-################################################################################
+
 # 🎯 OBJECTIVES
-################################################################################
+
 
 objectives:
   - 💬 Enable empathetic AI-based mental health conversations
@@ -24,9 +24,9 @@ objectives:
   - 🔒 Preserve user privacy and data confidentiality
   - 🧩 Provide a modular backend suitable for real-world deployment
 
-################################################################################
+
 # ⭐ KEY FEATURES
-################################################################################
+
 
 key_features:
   conversational_ai:
@@ -56,9 +56,9 @@ key_features:
     - 🔐 No personal identifiers
     - 🔐 Anonymous in-memory analytics only
 
-################################################################################
+
 # 🏗️ BACKEND ARCHITECTURE
-################################################################################
+
 
 backend_architecture:
   root: src/
@@ -86,9 +86,9 @@ backend_architecture:
       pss10_json: "PSS-10 questionnaire data"
       cbi_burnout_json: "Burnout questionnaire data"
 
-################################################################################
+
 # ⚙️ TECHNOLOGY STACK
-################################################################################
+
 
 tech_stack:
   runtime: "Node.js"
@@ -100,9 +100,9 @@ tech_stack:
   environment_management: ".env (excluded from GitHub)"
   version_control: "Git & GitHub"
 
-################################################################################
+
 # 🔄 SYSTEM WORKFLOW
-################################################################################
+
 
 system_flow:
   - 🧑 User sends a message to the `/chat` endpoint
