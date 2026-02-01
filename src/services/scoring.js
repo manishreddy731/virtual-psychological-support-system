@@ -1,22 +1,33 @@
-export function scoreLikert(answers, min=0, max=3) {
-  if (!Array.isArray(answers)) throw new Error('answers must be array');
-  const invalid = answers.some(a => typeof a !== 'number' || a < min || a > max);
-  if (invalid) throw new Error('invalid answer value');
-  const total = answers.reduce((s, x) => s + x, 0);
-  return { total };
+export function scoreAssessment(type, answers) {
+  return Object.values(answers).reduce((sum, val) => sum + val, 0);
 }
 
-export function interpretPHQ9(total){
-  if (total <= 4) return 'minimal';
-  if (total <= 9) return 'mild';
-  if (total <= 14) return 'moderate';
-  if (total <= 19) return 'moderately severe';
-  return 'severe';
-}
+export function categorizeScore(type, score) {
+  switch (type) {
+    case 'phq9':
+      if (score <= 4) return 'minimal';
+      if (score <= 9) return 'mild';
+      if (score <= 14) return 'moderate';
+      if (score <= 19) return 'moderately severe';
+      return 'severe';
 
-export function interpretGAD7(total){
-  if (total <= 4) return 'minimal';
-  if (total <= 9) return 'mild';
-  if (total <= 14) return 'moderate';
-  return 'severe';
+    case 'gad7':
+      if (score <= 4) return 'minimal';
+      if (score <= 9) return 'mild';
+      if (score <= 14) return 'moderate';
+      return 'severe';
+
+    case 'pss10':
+      if (score <= 13) return 'low';
+      if (score <= 26) return 'moderate';
+      return 'high';
+
+    case 'burnout':
+      if (score <= 30) return 'low';
+      if (score <= 60) return 'moderate';
+      return 'high';
+
+    default:
+      return 'unknown';
+  }
 }
