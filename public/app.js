@@ -257,17 +257,34 @@ personalizedForm.addEventListener('submit', async event => {
   `;
 });
 
-openSafety.addEventListener('click', () => {
-  safetyModal.hidden = false;
-});
-
-closeSafety.addEventListener('click', () => {
+const closeSafetyModal = () => {
   safetyModal.hidden = true;
+};
+
+if (openSafety) {
+  openSafety.addEventListener('click', () => {
+    safetyModal.hidden = false;
+  });
+}
+
+if (closeSafety) {
+  closeSafety.addEventListener('click', closeSafetyModal);
+}
+
+if (safetyModal) {
+  safetyModal.addEventListener('click', event => {
+    if (event.target === safetyModal) {
+      closeSafetyModal();
+    }
+  });
+}
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && safetyModal && !safetyModal.hidden) {
+    closeSafetyModal();
+  }
 });
 
-safetyModal.addEventListener('click', event => {
-  if (event.target === safetyModal) {
-    safetyModal.hidden = true;
   }
 });
 
