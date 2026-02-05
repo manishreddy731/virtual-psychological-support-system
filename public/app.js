@@ -13,6 +13,10 @@ const libraryGrid = document.getElementById('library-grid');
 const personalizedForm = document.getElementById('personalized-form');
 const personalizedOutput = document.getElementById('personalized-output');
 const metricsGrid = document.getElementById('metrics-grid');
+const safetyModal = document.getElementById('safety-modal');
+const openSafety = document.getElementById('open-safety');
+const closeSafety = document.getElementById('close-safety');
+
 const startCheckin = document.getElementById('start-checkin');
 
 const API = {
@@ -254,6 +258,10 @@ personalizedForm.addEventListener('submit', async event => {
   `;
 });
 
+const safetyModal = document.getElementById('safety-modal');
+const openSafety = document.getElementById('open-safety');
+const closeSafety = document.getElementById('close-safety');
+ main
 assessmentDock.addEventListener('click', () => {
   toggleAssessmentDrawer(true);
 });
