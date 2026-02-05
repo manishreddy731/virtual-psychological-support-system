@@ -285,6 +285,9 @@ document.addEventListener('keydown', event => {
   }
 });
 
+  }
+});
+
 assessmentDock.addEventListener('click', () => {
   toggleAssessmentDrawer(true);
 });
