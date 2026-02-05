@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Serenity Suites | Virtual Psychological Support</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="ambient-orb orb-one"></div>
+    <div class="ambient-orb orb-two"></div>
+
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark">SS</span>
+        <div>
+          <p class="brand-title">Serenity Suites</p>
+          <p class="brand-subtitle">Virtual Psychological Support System</p>
+        </div>
+      </div>
+      <nav class="nav-actions">
+        <button class="primary-button" id="start-checkin">Start Chat</button>
+      </nav>
+    </header>
+
+    <main class="app-shell">
+      <section class="panel chat-panel" id="chat-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Confidential • Evidence-guided • Student-first</p>
+            <h1>Chat with your wellbeing companion.</h1>
+            <p>
+              Experience a calm, guided space that integrates real-time wellbeing chat,
+              clinical screening tools, and tailored coping plans.
+            </p>
+          </div>
+          <div class="panel-badges">
+            <span class="badge">/chat</span>
+            <span class="badge">Crisis Screening</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="chat-window" id="chat-window"></div>
+          <form class="chat-form" id="chat-form">
+            <textarea
+              id="chat-input"
+              placeholder="Share what’s on your mind..."
+              rows="3"
+              required
+            ></textarea>
+            <div class="chat-actions">
+              <button type="button" class="ghost-button" id="quick-stress">I feel stressed</button>
+              <button type="submit" class="primary-button">Send</button>
+            </div>
+          </form>
+          <div class="suggestion-card" id="assessment-suggestion" hidden>
+            <div>
+              <h3>Suggested Assessments</h3>
+              <p id="suggestion-message"></p>
+            </div>
+            <div class="suggestion-actions" id="suggestion-actions"></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side-stack">
+        <section class="panel" id="suggestions-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Coping Library</h2>
+              <p>Luxury micro-routines curated for immediate calm.</p>
+            </div>
+            <div class="panel-badges">
+              <span class="badge">/suggestions/library</span>
+              <span class="badge">/suggestions/personalized</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="library-grid" id="library-grid"></div>
+            <div class="personalized-card">
+              <h3>Request a Personalized Reset Plan</h3>
+              <form id="personalized-form">
+                <input id="feeling" type="text" placeholder="Feeling (e.g., anxious, scattered)" />
+                <input id="context" type="text" placeholder="Context (e.g., exams, roommates)" />
+                <button class="primary-button" type="submit">Generate Plan</button>
+              </form>
+              <div id="personalized-output"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="metrics-panel">
+          <div class="panel-header">
+            <div>
+              <h2>System Metrics</h2>
+              <p>Live analytics drawn from backend statistics.</p>
+            </div>
+            <div class="panel-badges">
+              <span class="badge">/chat/stats</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="metrics-grid" id="metrics-grid"></div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <button class="assessment-dock" id="assessment-dock">
+      <span class="dock-label">Assessments</span>
+      <span class="dock-pill">PHQ-9 • GAD-7 • PSS-10 • Burnout</span>
+    </button>
+
+    <div class="assessment-drawer" id="assessment-drawer" hidden>
+      <div class="drawer-header">
+        <div>
+          <h2>Clinical Screenings</h2>
+          <p>Validated tools presented with clarity and warmth.</p>
+        </div>
+        <button class="ghost-button" id="close-assessments">Close</button>
+      </div>
+      <div class="assessment-shell" id="assessment-shell">
+        <div class="assessment-empty">
+          <p>Select an assessment to begin.</p>
+          <div class="assessment-actions">
+            <button class="ghost-button" data-assessment="phq9">PHQ-9</button>
+            <button class="ghost-button" data-assessment="gad7">GAD-7</button>
+            <button class="ghost-button" data-assessment="pss10">PSS-10</button>
+            <button class="ghost-button" data-assessment="burnout">Burnout Inventory</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>Serenity Suites is a supportive experience, not a substitute for professional care.</p>
+    </footer>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
