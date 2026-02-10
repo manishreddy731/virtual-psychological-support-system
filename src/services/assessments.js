@@ -1,35 +1,26 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// src/services/assessments.js
 
-// Resolve __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import phq9 from '../data/phq9.json' with { type: 'json' };
+import gad7 from '../data/gad7.json' with { type: 'json' };
+import pss10 from '../data/pss10.json' with { type: 'json' };
+import burnout from '../data/cbi_burnout.json' with { type: 'json' };
 
-// Helper to load JSON safely
-function loadJSON(filename) {
-  const filePath = path.join(__dirname, '../data', filename);
-  const raw = fs.readFileSync(filePath, 'utf-8');
-  return JSON.parse(raw);
+const ASSESSMENTS = {
+  phq9,
+  gad7,
+  pss10,
+  burnout
+};
+
+export function listAssessments() {
+  return Object.values(ASSESSMENTS).map(a => ({
+    id: a.id,
+    title: a.title,
+    description: a.description,
+    itemsCount: a.items.length
+  }));
 }
 
-// Load assessments
-const phq9 = loadJSON('phq9.json');
-const gad7 = loadJSON('gad7.json');
-const pss10 = loadJSON('pss10.json');
-const burnout = loadJSON('cbi_burnout.json');
-
 export function getAssessment(type) {
-  switch (type) {
-    case 'phq9':
-      return phq9;
-    case 'gad7':
-      return gad7;
-    case 'pss10':
-      return pss10;
-    case 'burnout':
-      return burnout;
-    default:
-      throw new Error('Invalid assessment type');
-  }
+  return ASSESSMENTS[type] || null;
 }

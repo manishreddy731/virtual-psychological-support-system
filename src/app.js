@@ -4,17 +4,24 @@ import cors from 'cors';
 import morgan from 'morgan';
 import crypto from 'crypto';
 
+import { requireAuth } from './middleware/requireAuth.js';
+
 import chatRouter from './routes/chat.js';
+import assessmentsRouter from './routes/assessments.js';
 import suggestionsRouter from './routes/suggestions.js';
+import actionsRouter from './routes/actions.js';
+import adminRouter from './routes/admin.js';
 
 const app = express();
 
-// minimal privacy-first logging (no request bodies)
-app.use(morgan('tiny', { skip: () => process.env.NODE_ENV === 'test' }));
+// -----------------------------------------------------------------------------
+// Middleware
+// -----------------------------------------------------------------------------
+app.use(morgan('tiny'));
 app.use(cors());
 app.use(express.json({ limit: '200kb' }));
 
-// attach request context (no sensitive data)
+// attach request context
 app.use((req, _res, next) => {
   req.context = {
     requestId: crypto.randomUUID?.() ?? String(Date.now())
@@ -22,16 +29,27 @@ app.use((req, _res, next) => {
   next();
 });
 
-// health check
+// -----------------------------------------------------------------------------
+// Health
+// -----------------------------------------------------------------------------
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
 });
 
-// routes
-app.use('/chat', chatRouter);
-app.use('/suggestions', suggestionsRouter);
+// -----------------------------------------------------------------------------
+// Protected routes (AUTH REQUIRED)
+// -----------------------------------------------------------------------------
+app.use('/chat', requireAuth, chatRouter);
+app.use('/assessments', requireAuth, assessmentsRouter);
+app.use('/suggestions', requireAuth, suggestionsRouter);
+app.use('/actions', requireAuth, actionsRouter);
 
-// global error handler (redacted response)
+// admin (can add role checks later)
+app.use('/admin', requireAuth, adminRouter);
+
+// -----------------------------------------------------------------------------
+// Global error handler (redacted)
+// -----------------------------------------------------------------------------
 app.use((err, _req, res, _next) => {
   console.error('[error]', err?.message);
   res.status(err?.status || 500).json({ error: 'internal_error' });

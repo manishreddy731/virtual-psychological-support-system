@@ -1,33 +1,36 @@
-export function scoreAssessment(type, answers) {
-  return Object.values(answers).reduce((sum, val) => sum + val, 0);
+// src/services/scoring.js
+
+export function scoreLikert(answers = []) {
+  return answers.reduce((sum, v) => sum + Number(v), 0);
 }
 
-export function categorizeScore(type, score) {
-  switch (type) {
-    case 'phq9':
-      if (score <= 4) return 'minimal';
-      if (score <= 9) return 'mild';
-      if (score <= 14) return 'moderate';
-      if (score <= 19) return 'moderately severe';
-      return 'severe';
+// ---------- PHQ-9 ----------
+export function interpretPHQ9(score) {
+  if (score <= 4) return 'minimal';
+  if (score <= 9) return 'mild';
+  if (score <= 14) return 'moderate';
+  if (score <= 19) return 'moderately_severe';
+  return 'severe';
+}
 
-    case 'gad7':
-      if (score <= 4) return 'minimal';
-      if (score <= 9) return 'mild';
-      if (score <= 14) return 'moderate';
-      return 'severe';
+// ---------- GAD-7 ----------
+export function interpretGAD7(score) {
+  if (score <= 4) return 'minimal';
+  if (score <= 9) return 'mild';
+  if (score <= 14) return 'moderate';
+  return 'severe';
+}
 
-    case 'pss10':
-      if (score <= 13) return 'low';
-      if (score <= 26) return 'moderate';
-      return 'high';
+// ---------- PSS-10 ----------
+export function interpretPSS10(score) {
+  if (score <= 13) return 'low';
+  if (score <= 26) return 'moderate';
+  return 'high';
+}
 
-    case 'burnout':
-      if (score <= 30) return 'low';
-      if (score <= 60) return 'moderate';
-      return 'high';
-
-    default:
-      return 'unknown';
-  }
+// ---------- Burnout ----------
+export function interpretBurnout(score) {
+  if (score <= 33) return 'low';
+  if (score <= 66) return 'moderate';
+  return 'high';
 }

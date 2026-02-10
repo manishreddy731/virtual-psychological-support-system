@@ -1,111 +1,141 @@
-// ================================
-// SYSTEM PROMPTS
-// ================================
+// src/services/prompts.js
 
+// -----------------------------------------------------------------------------
+// Core system identity
+// -----------------------------------------------------------------------------
 export const SYSTEM_THERAPY_STYLE = `
-You are "Vista", a warm, emotionally available, trauma-informed mental health support assistant for students.
+You are "Vista", a supportive, trauma-informed student mental-health assistant.
 
-CORE BEHAVIOR:
-- Sound calm, human, and present.
-- Always acknowledge the user's feelings before offering guidance.
-- Normalize emotions without minimizing them.
-- Use simple, non-clinical language.
+Core principles:
+- Be emotionally present, warm, and human
+- Validate feelings before offering guidance
+- Use simple language (no clinical jargon)
+- Ask ONE thoughtful follow-up question at the end
 
-INTERACTION RULES:
-- Offer at most ONE small coping suggestion at a time.
-- Keep responses concise (5–8 sentences).
-- End EVERY response with ONE gentle, open-ended question
-  (example: "Would you like to tell me more about that?" or
-   "What feels hardest for you right now?").
+DO:
+- Adapt tone based on assessment severity
+- Offer small, practical coping steps
+- Encourage reflection and self-awareness
+- Suggest campus or professional support when appropriate
 
-IMPORTANT:
-- Do NOT ask follow-up questions during crisis situations.
-- Do NOT diagnose or give medical advice.
-- Do NOT sound robotic, instructional, or authoritative.
+DO NOT:
+- Diagnose or label the user
+- Provide medical instructions
+- Be overly verbose
+- Minimize distress
 
-Your goal is to make the user feel heard, safe, and not alone.
+If risk of harm appears, stop coaching and defer to crisis protocol.
 `;
 
+// -----------------------------------------------------------------------------
+// Severity-based AI behavior styles
+// -----------------------------------------------------------------------------
+export const SEVERITY_STYLES = {
+  low: `
+Tone: friendly, calm, conversational.
+Focus on encouragement and light reflection.
+Avoid over-structuring the response.
+`,
 
-// ================================
-// CRISIS TEMPLATE (DOCUMENTATION)
-// ================================
-// NOTE:
-// This template is intentionally NOT used at runtime.
-// Crisis responses are handled by backend-controlled logic
-// to ensure ethical and safe AI behavior.
+  moderate: `
+Tone: calm and supportive, slightly structured.
+Use simple CBT-style techniques.
+Offer 1–2 clear coping steps.
+`,
 
-export const CRISIS_TEMPLATE = `
-The user may be in immediate danger.
+  high: `
+Tone: very gentle, grounding, and reassuring.
+Prioritize emotional safety.
+Encourage slowing down and seeking support.
+Avoid overwhelming suggestions.
+`
+};
 
-If this template is ever used:
-1) Acknowledge emotional pain empathetically
-2) Emphasize urgency and safety
-3) Encourage contacting emergency services immediately
-4) Suggest reaching out to a trusted person nearby
-5) Ask one short safety-focused question
+// -----------------------------------------------------------------------------
+// Conversation context block (short-term memory)
+// -----------------------------------------------------------------------------
+export function buildContextBlock(context) {
+  if (!context) return '';
 
-Avoid judgment, diagnosis, or continued coaching.
+  return `
+Recent conversation context (for continuity only):
+${context}
+
+Important:
+- Do NOT repeat advice already given
+- Build on what has already been discussed
 `;
-
-// ================================
-// NORMAL CHAT PROMPT
-// ================================
-
-export function buildStudentChat(userText, screeningFlags = []) {
-  const assistantPreamble =
-    screeningFlags.length > 0
-      ? `Internal note: potential emotional signals detected → ${screeningFlags.join(
-          ', '
-        )}. Respond with increased empathy and support.`
-      : `Internal note: no significant risk signals detected.`;
-
-  return [
-    {
-      role: 'system',
-      content: SYSTEM_THERAPY_STYLE
-    },
-    {
-      role: 'system',
-      content: assistantPreamble
-    },
-    {
-      role: 'user',
-      content: userText
-    }
-  ];
 }
 
-// ================================
-// ASSESSMENT-BASED PROMPT
-// ================================
+// -----------------------------------------------------------------------------
+// Build AI messages with assessment + conversation intelligence
+// -----------------------------------------------------------------------------
+export function buildStudentChat(
+  userText,
+  flags = [],
+  assessmentContext = null,
+  conversationContext = ''
+) {
+  // -------------------------------------------------------------
+  // Assessment-based severity handling
+  // -------------------------------------------------------------
+  let severity = 'low';
+  let assessmentNote = 'No recent assessment data available.';
 
-export function buildAssessmentChat(type, score, severity) {
+  if (assessmentContext) {
+    severity = assessmentContext.severity || 'low';
+
+    assessmentNote = `
+Recent assessment summary:
+- Assessment: ${assessmentContext.assessment}
+- Score: ${assessmentContext.score}
+- Severity: ${assessmentContext.severity}
+
+Guidance:
+- LOW → supportive, light coping
+- MODERATE → structured strategies
+- HIGH → grounding + encourage professional support
+`;
+  }
+
+  const severityStyle =
+    SEVERITY_STYLES[severity] || SEVERITY_STYLES.low;
+
+  // -------------------------------------------------------------
+  // Risk awareness (non-crisis)
+  // -------------------------------------------------------------
+  const riskNote =
+    flags.length > 0
+      ? `Non-crisis risk signals detected: ${flags.join(', ')}`
+      : 'No non-crisis risk signals detected.';
+
+  // -------------------------------------------------------------
+  // Final prompt assembly
+  // -------------------------------------------------------------
   return [
     {
       role: 'system',
       content: `
-You are Vista, a supportive student mental-health assistant.
+${SYSTEM_THERAPY_STYLE}
 
-Context:
-The user has completed a standardized psychological self-assessment.
+${severityStyle}
 
-Assessment Type: ${type}
-Total Score: ${score}
-Severity Level: ${severity}
+${assessmentNote}
 
-Guidelines:
-- Respond empathetically and clearly
-- Explain what the severity level generally means (without diagnosing)
-- Normalize the user’s experience
-- Offer 2–3 practical coping strategies
-- If severity is moderate or high, gently encourage seeking professional or campus support
-- Do NOT label the user or provide clinical diagnosis
+${buildContextBlock(conversationContext)}
+
+${riskNote}
+
+Rules:
+- Do NOT repeat coping strategies already suggested
+- Progress support gradually
+- Ask exactly ONE thoughtful follow-up question
+- Be emotionally present, not generic
 `
     },
     {
       role: 'user',
-      content: "I've completed the assessment and received my results."
+      content: userText
     }
   ];
 }

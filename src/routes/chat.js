@@ -1,166 +1,110 @@
+// src/routes/chat.js
+
 import { Router } from 'express';
 import { z } from 'zod';
 
 import { llmChat } from '../services/llm.js';
-import {
-  buildStudentChat,
-  buildAssessmentChat
-} from '../services/prompts.js';
-
+import { buildStudentChat } from '../services/prompts.js';
 import { screenRisk } from '../services/safety.js';
+import { getCrisisResponse } from '../services/crisisResponse.js';
+import { getLatestAssessment } from '../services/assessmentStore.js';
 import {
-  getCrisisResponse,
-  getViolenceResponse
-} from '../services/crisisResponse.js';
-
-import { getAssessment } from '../services/assessments.js';
+  addMessage,
+  getConversationContext
+} from '../services/conversationMemory.js';
 import {
-  scoreAssessment,
-  categorizeScore
-} from '../services/scoring.js';
+  trackChat,
+  trackCrisis
+} from '../services/analytics.js';
 
 const router = Router();
 
-/**
- * Request schema
- * - text → normal chat
- * - action=start_assessment → send questionnaire
- * - action=submit_assessment → score + AI response
- */
+// -----------------------------------------------------------------------------
+// Request validation
+// -----------------------------------------------------------------------------
 const schema = z.object({
-  text: z.string().min(1).max(2000).optional(),
-  action: z.enum(['start_assessment', 'submit_assessment']).optional(),
-  type: z.string().optional(),
-  answers: z.record(z.number()).optional()
+  text: z.string().min(1).max(2000)
 });
 
+// -----------------------------------------------------------------------------
+// POST /chat
+// Main conversational endpoint
+// -----------------------------------------------------------------------------
 router.post('/', async (req, res, next) => {
   try {
-    const body = schema.parse(req.body);
+    const { text } = schema.parse(req.body);
+    const userId = req.user.userId;
 
-    // ===============================
-    // 1️⃣ START ASSESSMENT
-    // ===============================
-    if (body.action === 'start_assessment') {
-      const { type } = body;
-
-      if (!type) {
-        return res.status(400).json({ error: 'Assessment type is required' });
-      }
-
-      const questions = getAssessment(type);
-
-      return res.json({
-        assessment: true,
-        type,
-        message: 'Please answer the following questions honestly.',
-        questions
-      });
-    }
-
-    // ===============================
-    // 2️⃣ SUBMIT ASSESSMENT
-    // ===============================
-    if (body.action === 'submit_assessment') {
-      const { type, answers } = body;
-
-      if (!type || !answers) {
-        return res
-          .status(400)
-          .json({ error: 'Assessment type and answers are required' });
-      }
-
-      const score = scoreAssessment(type, answers);
-      const severity = categorizeScore(type, score);
-
-      const messages = buildAssessmentChat(type, score, severity);
-
-      const content = await llmChat(messages, {
-        temperature: 0.4,
-        maxTokens: 500
-      });
-
-      return res.json({
-        assessmentComplete: true,
-        type,
-        score,
-        severity,
-        reply: content
-      });
-    }
-
-    // ===============================
-    // 3️⃣ NORMAL CHAT FLOW
-    // ===============================
-    const { text } = body;
-
-    if (!text) {
-      return res.status(400).json({ error: 'Text is required' });
-    }
-
+    // -------------------------------------------------------------------------
+    // Safety screening
+    // -------------------------------------------------------------------------
     const { crisis, flags } = screenRisk(text);
 
-    // 🚨 HIGH-RISK MODE — STOP AI COMPLETELY
+    // -------------------------------------------------------------------------
+    // 🚨 CRISIS MODE — STOP AI COMPLETELY
+    // -------------------------------------------------------------------------
     if (crisis) {
-      console.warn('[CRISIS] High-risk message detected:', flags);
+      trackCrisis(flags);
 
-      router.stats = router.stats || { total: 0, crisisCount: 0, tags: {} };
-      router.stats.total++;
-      router.stats.crisisCount++;
-      flags.forEach(f => (router.stats.tags[f] = (router.stats.tags[f] || 0) + 1));
+      // Store user message (but no assistant reply)
+      addMessage(userId, 'user', text);
 
-      if (flags.includes('self_harm')) {
-        return res.status(200).json(getCrisisResponse());
-      }
-
-      if (flags.includes('harm_to_others')) {
-        return res.status(200).json(getViolenceResponse());
-      }
-
-      return res.status(200).json(getCrisisResponse());
+      return res.status(200).json(
+        getCrisisResponse(flags)
+      );
     }
 
-    // ✅ NON-CRISIS CHAT → AI
-    const messages = buildStudentChat(text, flags);
+    // -------------------------------------------------------------------------
+    // 🧠 Fetch latest assessment context (severity memory)
+    // -------------------------------------------------------------------------
+    const latestAssessment = getLatestAssessment(userId);
 
-    const content = await llmChat(messages, {
+    // -------------------------------------------------------------------------
+    // 🧠 Fetch short-term conversation context
+    // -------------------------------------------------------------------------
+    const conversationContext = getConversationContext(userId);
+
+    // -------------------------------------------------------------------------
+    // 🧩 Build AI prompt with assessment + conversation intelligence
+    // -------------------------------------------------------------------------
+    const messages = buildStudentChat(
+      text,
+      flags,
+      latestAssessment,
+      conversationContext
+    );
+
+    // -------------------------------------------------------------------------
+    // 🤖 Call LLM
+    // -------------------------------------------------------------------------
+    const reply = await llmChat(messages, {
       temperature: 0.5,
-      maxTokens: 500
+      maxTokens: 600
     });
 
-    // analytics
-    router.stats = router.stats || { total: 0, crisisCount: 0, tags: {} };
-    router.stats.total++;
-    flags.forEach(f => (router.stats.tags[f] = (router.stats.tags[f] || 0) + 1));
+    // -------------------------------------------------------------------------
+    // 🧠 Store conversation memory (privacy-safe)
+    // -------------------------------------------------------------------------
+    addMessage(userId, 'user', text);
+    addMessage(userId, 'assistant', reply);
 
-    // 🔹 Suggest assessment (frontend button trigger)
-    const suggestAssessment = flags.includes('stress') || flags.includes('anxiety');
+    // -------------------------------------------------------------------------
+    // 📊 Analytics (aggregate only)
+    // -------------------------------------------------------------------------
+    trackChat(flags);
 
+    // -------------------------------------------------------------------------
+    // Response
+    // -------------------------------------------------------------------------
     res.json({
-      reply: content,
+      reply,
       crisis: false,
       flags,
-      ...(suggestAssessment
-        ? {
-            suggestion: {
-              message:
-                'Would you like to take a short assessment to understand this better?',
-              options: [
-                { label: 'Stress Test', type: 'pss10' },
-                { label: 'Anxiety Test', type: 'gad7' },
-                { label: 'Depression Test', type: 'phq9' }
-              ]
-            }
-          }
-        : {})
+      assessmentContext: latestAssessment || null
     });
-  } catch (e) {
-    next(e);
+  } catch (err) {
+    next(err);
   }
-});
-
-router.get('/stats', (_req, res) => {
-  res.json(router.stats || { total: 0, crisisCount: 0, tags: {} });
 });
 
 export default router;
